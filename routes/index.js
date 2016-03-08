@@ -2,6 +2,7 @@ var express = require('express');
 var passport = require('passport');
 var Account = require('../models/account');
 var router = express.Router();
+var https = require('https');
 
 router.get('/', function (req, res) {
     res.render('index', { user : req.user });
@@ -11,16 +12,24 @@ router.get('/register', function(req, res) {
     res.render('register', { });
 });
 
-router.post('/register', function(req, res) {
-    Account.register(new Account({ username : req.body.username,email: req.body.email }), req.body.password, function(err, account) {
-        if (err) {
-            return res.render('register', { account : account });
-        }
-
-        passport.authenticate('local')(req, res, function () {
-            res.redirect('/');
-        });
-    });
+router.post('/register',function(req,res) {
+	verifyRecaptcha(req.body["g-recaptcha-response"],function(success){
+		if (success) {
+			    Account.register(new Account({ username : req.body.username,email: req.body.email, fname: req.body.fname, lname: req.body.lname }), req.body.password, function(err, account) {
+					if (err) {
+						if (err.code==11000) { res.render('error',{message:'Email already exists!',error:err}); }
+						return res.render('register', { account : account });
+					}
+					passport.authenticate('local')(req, res, function () {
+						res.redirect('/');
+					});
+				});
+		} else {
+			console.log("FAILURE");
+			res.end("Captcha failed!");
+			// go back, restore input
+		}
+	});
 });
 
 router.get('/login', function(req, res) {
@@ -53,5 +62,24 @@ router.get('/logout', function(req, res) {
 router.get('/ping', function(req, res){
     res.status(200).send("pong!");
 });
+
+var SECRET = "6LfvKxoTAAAAAPWghP4MAGTVRyxtLfMDpI5l6khU";
+// Helper function to make API call to recatpcha and check response
+function verifyRecaptcha(key, callback) {
+        https.get("https://www.google.com/recaptcha/api/siteverify?secret=" + SECRET + "&response=" + key, function(res) {
+                var data = "";
+                res.on('data', function (chunk) {
+                        data += chunk.toString();
+                });
+                res.on('end', function() {
+                        try {
+                                var parsedData = JSON.parse(data);
+                                callback(parsedData.success);
+                        } catch (e) {
+                                callback(false);
+                        }
+                });
+        });
+}
 
 module.exports = router;
