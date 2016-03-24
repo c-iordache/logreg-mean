@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  .container
+    h1 Create event page
+    p.lead Fill out the form and you're set!
+    br
+    form(role='form', action="/event/create",method="post", style='max-width: 300px;')
+      .form-group
+          input.form-control(type='text', name="name", placeholder='Event name')
+      .form-group
+          input.form-control(type='text', name="date", placeholder='Date')
+      .form-group
+          input.form-control(type='text', name="description", placeholder='Description')
+      .form-group
+          input.form-control(type='text',name="address",placeholder='Enter address')
+      button.btn.btn-default(type='submit') Submit
+      &nbsp;
+      a(href='/')
+        button.btn.btn-primary(type="button") Cancel

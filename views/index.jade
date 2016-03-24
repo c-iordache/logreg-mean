@@ -1,10 +1,15 @@
 extends layout
 
 block content
+  a(href="/event") View events
+  br
   if (!user)
-    a(href="/login") Login
+    a(href="/user/login") Login
     br
-    a(href="/register") Register
+    a(href="/user/register") Register
   if (user)
     p You are currently logged in as #{user.username}
-    a(href="/logout") Logout
+    br
+    a(href="/event/create") Create an event
+    br
+    a(href="/user/logout") Logout

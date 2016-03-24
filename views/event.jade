@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  if (user)
+    p Hey #{user.username}!
+    a(href="/event/create") Create event
+    br
+  a(href="/") Go back
+  br
+  br
+  p List of events
+  each item in somedata
+    p #{item.name} Description: #{item.description}
