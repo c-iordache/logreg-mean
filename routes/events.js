@@ -8,8 +8,9 @@ router.get('/', function(req, res, next) {
 	/*var eventz = */Event.find({},function(err,events){
 		if (err) throw err;
 		console.log(events);
-		res.render('event',{somedata: events,user: req.user});
-	});
+		//res.render('event',{eventList: events,user: req.user});
+	}).populate('createdBy').exec(function(err,events) {
+	res.render('event',{eventList: events,user: req.user});});
 });
 
 router.get('/create', function(req, res) {
@@ -17,7 +18,7 @@ router.get('/create', function(req, res) {
 });
 
 router.post('/create',function(req,res) {
-				var newevent = new Event({name : req.body.name,date: req.body.date, description: req.body.description, address: req.body.address});
+				var newevent = new Event({name : req.body.name,date: req.body.date, description: req.body.description, address: req.body.address, createdBy: req.user._id});
 				newevent.save(function(err) {
 					if (err) {
 						 res.render('error',{message:'Event already exists!',error:err}); 
@@ -27,7 +28,7 @@ router.post('/create',function(req,res) {
 					Event.find({},function(err,events){
 						if (err) throw err;
 						console.log(events);
-						res.render('event',{somedata: events});
+						res.render('event',{eventList: events});
 					});
 				});
 });

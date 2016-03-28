@@ -9,5 +9,5 @@ block content
   br
   br
   p List of events
-  each item in somedata
-    p #{item.name} Description: #{item.description}
+  each item in eventList
+    p #{item.name} Description: #{item.description} createdBy: #{item.createdBy.username}
